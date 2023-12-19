@@ -3,7 +3,7 @@
 
   inputs = {
     disko = {
-      url = "github:nix-community/disko";
+      url = "git+file:///home/jhoffer/srcs/github/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-anywhere.url = "github:numtide/nixos-anywhere";
@@ -16,20 +16,9 @@
     pathToDefault = self.nixosConfigurations.default;
     sharedModules = [
           ./common.nix
-          ({ config, pkgs, ... }: {
-            system.stateVersion = config.system.nixos.version;
-            services.sshd.enable = true;
-            users.users.root.openssh.authorizedKeys.keys = [
-	      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA0s7ucRRzdvbUnDCSq6SEfwwnugqFetMKaNOuZfjjmV josh@greyfox"
-            ];
-            environment.etc."install-default" = {
-              source = self.nixosConfigurations.default.config.system.build.diskoScript;
-              mode = "0777";
-            };
-            boot.initrd.systemd.emergencyAccess = true;
-            boot.initrd.systemd.initrdBin = with pkgs; [ bash util-linux ];
-            users.users.root.hashedPassword = "$6$/tibEVNXmyw69$nS0QMNFnRWtGyKKwaWYo30qtM9uya9VsLNTztFxaNS5pAiU6kcyaEdgyR2B2s6gYL41MYfr1JNmpybPM0Gern1";
-          })
+          {
+            _module.args.self = self;
+          }
     ];
   in {
     # https://github.com/Lassulus/flakes-testing/blob/master/flake.nix
